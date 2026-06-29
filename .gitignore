@@ -1,0 +1,7 @@
+# OS cruft
+.DS_Store
+
+# Diagram outputs are work artifacts — never commit them
+*.png
+*.mmd
+kroki-diagrams/

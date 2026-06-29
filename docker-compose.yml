@@ -1,0 +1,40 @@
+# Kroki diagram renderer — main engine + Mermaid companion on a shared network.
+#
+# `kroki` delegates Mermaid rendering to the `kroki-mermaid` container, reaching
+# it by DNS hostname (KROKI_MERMAID_HOST) over the shared `kroki-net` network.
+# Only the main engine needs a published port; the companion stays internal.
+#
+# Host port defaults to 8585 (8000 is commonly busy). Override with KROKI_PORT,
+# e.g. `KROKI_PORT=9123 docker compose up -d`.
+#
+#   docker compose up -d                       # start both
+#   docker compose down                        # stop both
+#   curl -sf localhost:${KROKI_PORT:-8585}/    # health check
+
+services:
+  kroki:
+    image: yuzutech/kroki
+    container_name: kroki
+    restart: unless-stopped
+    ports:
+      - "${KROKI_PORT:-8585}:8000"
+    environment:
+      KROKI_MERMAID_HOST: kroki-mermaid
+    networks:
+      - kroki-net
+    depends_on:
+      - kroki-mermaid
+
+  kroki-mermaid:
+    image: yuzutech/kroki-mermaid
+    container_name: kroki-mermaid
+    restart: unless-stopped
+    expose:
+      - "8002"
+    networks:
+      - kroki-net
+
+networks:
+  kroki-net:
+    name: kroki-net
+    driver: bridge
