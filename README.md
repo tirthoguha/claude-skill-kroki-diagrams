@@ -49,46 +49,25 @@ docker compose up -d                          # or: KROKI_PORT=9123 docker compo
 curl -sf http://localhost:8585/ >/dev/null && echo "Kroki OK"
 ```
 
-**Step 2 — make the skill available to Claude Code.** Two options, below.
-
-Then in Claude Code, ask for any diagram ("draw the architecture", "sequence
-diagram of the auth flow", …) and the skill takes over.
-
-## Installing the skill into Claude Code
-
-A Claude Code skill is just a directory containing a `SKILL.md`. Claude discovers
-it from one of these locations — pick whichever fits:
-
-### Option A — manual (clone + symlink or copy)
-
-The directory name becomes the command name (`/kroki-diagrams`). Symlink so the
-skill tracks `git pull`s:
+**Step 2 — make the skill available to Claude Code.** A skill is just a directory
+containing a `SKILL.md`; Claude discovers it under `~/.claude/skills/` (personal)
+or `.claude/skills/` (this project only). The directory name becomes the command,
+so installing it as `kroki` gives you **`/kroki`**. Symlink it so it tracks
+`git pull`s:
 
 ```bash
 # Personal (all your projects):
-ln -s "$PWD/skills/kroki-diagrams" ~/.claude/skills/kroki-diagrams
-# …or project-scoped (this repo only, commit it for teammates):
-ln -s "$PWD/skills/kroki-diagrams" .claude/skills/kroki-diagrams
+ln -s "$PWD/skills/kroki" ~/.claude/skills/kroki
+# …or project-scoped (commit .claude/skills/kroki for teammates):
+ln -s "$PWD/skills/kroki" .claude/skills/kroki
 ```
 
-> **Windows:** `mklink /D` (cmd, admin) or `New-Item -ItemType SymbolicLink`
-> (PowerShell), or just copy the folder: `cp -r skills/kroki-diagrams ~/.claude/skills/`.
+> **Windows:** use `mklink /D` (cmd, admin) or `New-Item -ItemType SymbolicLink`
+> (PowerShell), or just copy the folder: `cp -r skills/kroki ~/.claude/skills/`.
 
-### Option B — as a plugin via the bundled marketplace
-
-This repo doubles as a one-plugin marketplace (`.claude-plugin/marketplace.json`),
-so others can install without cloning:
-
-```text
-/plugin marketplace add tirthoguha/claude-skill-kroki-diagrams
-/plugin install kroki@kroki-diagrams-skill
-```
-
-Installed this way the skill is namespaced: invoke it as `/kroki:kroki-diagrams`.
-Plugin installs update via `/plugin marketplace update`.
-
-> Either way you still need the Kroki stack from **Step 1** running locally — the
-> plugin ships the skill, not the Docker containers.
+Then in Claude Code ask for any diagram ("draw the architecture", "sequence
+diagram of the auth flow", …) — or type `/kroki` — and the skill takes over. It
+still needs the Kroki stack from **Step 1** running locally.
 
 ## Configuring the port
 
@@ -133,38 +112,29 @@ writes them outside any repo by default (`KROKI_DIAGRAMS_DIR`, default
 `~/Documents/kroki-diagrams/<topic>/`). They belong in your docs/Confluence, not
 in version control.
 
-## How this repo is packaged (skill distribution formats)
-
-A Claude Code skill is just a `SKILL.md` in a directory. This repo ships it in
-the two formats Claude Code recognises, so consumers can pick either install
-path above:
+## How this repo is packaged
 
 ```
 claude-skill-kroki-diagrams/
-├── .claude-plugin/
-│   ├── plugin.json         # marks the repo root as a plugin named "kroki"
-│   └── marketplace.json    # lists that plugin → enables /plugin marketplace add
 ├── skills/
-│   └── kroki-diagrams/
-│       └── SKILL.md        # the skill itself (Option A symlinks this dir)
+│   └── kroki/
+│       └── SKILL.md        # the skill — symlink this dir into ~/.claude/skills/
 ├── docker-compose.yml      # the local Kroki stack the skill drives
 ├── LICENSE
 └── README.md
 ```
 
-- **As a bare skill** — Claude loads any `<name>/SKILL.md` under `~/.claude/skills/`
-  (personal) or `.claude/skills/` (project). The directory name is the command
-  name. That's Option A.
-- **As a plugin** — `.claude-plugin/plugin.json` (`name`, `description`,
-  `version`, `author`) marks the repo as a plugin; its `skills/` dir is
-  auto-discovered. Skills are namespaced `/<plugin>:<skill>`.
-- **As a marketplace** — `.claude-plugin/marketplace.json` lists the plugin with
-  `source: "."` (the repo itself), so one repo is both the plugin source and its
-  own catalogue. That's what makes `/plugin marketplace add <owner/repo>` work
-  (Option B).
+It ships as a **bare skill**: Claude Code loads any `<name>/SKILL.md` placed under
+`~/.claude/skills/` (personal) or `.claude/skills/` (project), and the directory
+name is the command. Installed as `kroki`, that's `/kroki` — no namespace prefix.
 
-To fork this into your own skill, swap the `SKILL.md`, rename the `skills/<dir>`,
-and update the `name`/`description` in both `.claude-plugin/*.json` files.
+> **Want it as a plugin instead?** Claude Code can also distribute skills as
+> plugins via a marketplace (`/plugin marketplace add <owner/repo>` →
+> `/plugin install …`). That route namespaces the command as `/<plugin>:<skill>`,
+> which is why this repo skips it — a bare skill keeps the command a clean
+> `/kroki`. To wrap it as a plugin anyway, add a `.claude-plugin/plugin.json`
+> (`name`, `description`, `version`, `author`) at the repo root plus a
+> `.claude-plugin/marketplace.json` listing it with `source: "."`.
 
 ## License / attribution
 

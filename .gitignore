@@ -1,7 +1,10 @@
 # OS cruft
 .DS_Store
 
-# Diagram outputs are work artifacts — never commit them
-*.png
-*.mmd
-kroki-diagrams/
+# Rendered diagram outputs are work artifacts. The skill writes them outside the
+# repo by default (KROKI_DIAGRAMS_DIR), but ignore any that land here by mistake.
+# Scoped to the repo root so we never accidentally exclude skill source dirs.
+/*.png
+/*.mmd
+/kroki-diagrams/
+/diagrams/
