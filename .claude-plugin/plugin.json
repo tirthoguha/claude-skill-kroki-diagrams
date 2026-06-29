@@ -1,0 +1,12 @@
+{
+  "name": "kroki",
+  "description": "Render Mermaid/Kroki diagrams to flattened white-background PNGs via a local Kroki + kroki-mermaid Docker stack, then review each render visually.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Tirtho Guha"
+  },
+  "homepage": "https://github.com/tirthoguha/claude-skill-kroki-diagrams",
+  "repository": "https://github.com/tirthoguha/claude-skill-kroki-diagrams",
+  "license": "MIT",
+  "keywords": ["kroki", "mermaid", "diagrams", "plantuml", "confluence", "architecture"]
+}
